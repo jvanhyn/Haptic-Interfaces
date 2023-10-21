@@ -19,8 +19,8 @@ xwall = 0.025; % wall position, m
  
 % times for dynamic simulation
 tstart = 0;    % s
-tend = 10;      % s
-T = 0.00001;    % s
+tend = 50;      % s
+T = 0.01;    % s
 t = (tstart:T:tend)';   % time vector
  
 % human input
@@ -41,12 +41,12 @@ xh = zeros(length(t),1);    % handle position
 vh = zeros(length(t),1);    % handle velocity
 ah = zeros(length(t),1);    % handle acceleration
 fa = zeros(length(t),1);    % force applied by the actuator
-ff = fa;
 ffelt = zeros(length(t),1); % force felt by the human
- 
+xmax = 1;
+
 %% Dynamic Simulation
-P = 100000;
-for i = 1:P
+
+for i = 1:length(t)
     % integrate the main state derivatives
     if (i == 1)
         % first time step has no difference between desired and actual
@@ -73,7 +73,7 @@ for i = 1:P
     ffelt(i) = -fh;
     
     % damping force
-    ff(i) = 0;
+    ff(i) = -(b+bh)*vh(i);
  
     % Compute the sum of forces on the handle: applied force, human force,
     % and friction force. 
@@ -81,10 +81,18 @@ for i = 1:P
  
     % Compute the handle's new acceleration for the next iteration.
     ah(i) = ftotal / m;
+    if(xh >= xmax)
+        break
+    end
     
 end
+
 figure(2)
-plot(t(1:P),xh(1:P))
+hold on
+plot(t,xh)
+plot(t,xd(i))
+hold off
+
 
 % figure(1)
 % hold on
