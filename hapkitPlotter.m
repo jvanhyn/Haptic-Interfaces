@@ -1,7 +1,5 @@
 % Hapkit Plotter
-f = figure('visible','off');
-xmax = 0.06;
-fmax = 1.4;
+figure%('visible','off');
 
 % x-positions in the top subplot
 subplot(2,1,1)

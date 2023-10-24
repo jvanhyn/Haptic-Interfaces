@@ -13,8 +13,9 @@ location1 = pwd + "/figures/";
 location2 = pwd + "/data/";
 
 % times for dynamic simulation
+omega = 0.4*2*pi;
 tstart = 0;     % s
-tend = 5;      % s
+tend = 2.5/(omega/2/pi);      % s
 T = 0.01e-3;    % s
 t = (tstart:T:tend)';   % time vector
 
@@ -26,46 +27,57 @@ t = (tstart:T:tend)';   % time vector
 disp("1")
 run parameters1.m
 [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T); %#ok<*ASGLU>
+xmax = 0.07;
+fmax = 1.5;
 run hapkitPlotter.m;
 saveas(gcf,location1+"hapkitSimulation1.png")
 save(location2+"data1")
-close; 
+
 
 % ii Free Space
 disp("2")
 run parameters2.m
 [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T);
+xmax = 0.07;
+fmax = 1;
 run hapkitPlotter.m;
 saveas(gcf,location1+"hapkitSimulation2.png")
 save(location2+"data2")
-close; 
+
 
 % iii Initiate Inside Wall 
 disp("3")
 run parameters3.m
 [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T);
+xmax = 0.12;
+fmax = 20;
 run hapkitPlotter.m;
+subplot(2,1,1)
+axis([tstart,tend, 0,xmax])
 saveas(gcf,location1+"hapkitSimulation3.png")
 save(location2+"data3")
-close; 
+
 
 % iv Low Kwall model
 disp("4")
 run parameters4.m
 [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T);
+xmax = 0.07;
+fmax = 1;
 run hapkitPlotter.m;
 saveas(gcf,location1+"hapkitSimulation4.png")
 save(location2+"data4")
-close; 
+
 
 %v High Kwall model
 disp("5")
 run parameters5.m
 [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T);
+xmax = 0.07;
+fmax = 5;
 hapkitPlotter();
 saveas(gcf,location1+"hapkitSimulation5.png")
 save(location2+"data5")
-close; 
 
 %% Simulate Hapkit Function
 function [xh,vh,fa,ffelt] = hapkitSimulator(m,kh,bh,kwall,b,xwall,xd,vd,t,T)

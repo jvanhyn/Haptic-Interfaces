@@ -12,5 +12,6 @@ xwall = 0.025*ones(length(t),1); % wall position, m
 % human input
 omega = 0.4*2*pi;              % frequency of user's desired motion, rad/s
 A = 0.04;                      % amplitude of user's desired motion, m
-xd = A*ones(length(t),1);    % user's desired hand position, in m
-vd = zeros(length(t),1);    % user's desired hand velocity, in m/s
+xd = -A*cos(omega.*t)+A+xwall;    % user's desired hand position, in m
+vd = A*omega*sin(omega.*t);    % user's desired hand velocity, in m/s
+
