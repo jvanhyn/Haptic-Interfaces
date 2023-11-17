@@ -6,7 +6,7 @@ kh = 500;       % human hand stiffness, N/m
 bh = 10;        % human hand damping, Ns/m
 
 % virtual wall parameters
-kwall = 0;                     % wall stiffness, N/m
+kwall = 500;                     % wall stiffness, N/m
 xwall = 0.025*ones(length(t),1); % wall position, m
 
 % human input

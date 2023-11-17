@@ -116,21 +116,21 @@ for i = 1:length(t)
         % simple Euler integration (you could use something more accurate!)
         vh(i) = vh(i-1) + ah(i-1) * T;
         xh(i) = xh(i-1) + vh(i-1) * T;
-        xe(i) = encoder(xe(i-1),xh(i),false);
-        xs(i) = sampled(xs(i-1),xe(i),i,false);
+        xe(i) = encoder(xe(i-1),xh(i),false); % encoder, set to true to implement nonlinear behavior
+        xs(i) = sampled(xs(i-1),xe(i),i,false); % sampling, set to true to implement nonlinear behavior
     end
     
     % force applied by the virtual environment
     if (xs(i) > xwall(i))
-        fa(i) = kwall*(xwall(i)-xs(i)) -karnop(vh(i),true);
+        fa(i) = kwall*(xwall(i)-xs(i));
     else
         fa(i) = 0;
     end
     
-    fa(i) = sat(fa(i),false);
+    fa(i) = sat(fa(i),false); % saturation, set to true to implement nonlinear behavior
     
     if (i~=1)
-        [fa(i), t_zoh] = zoh(fa(i-1),fa(i),t_zoh,t(i),false);
+        [fa(i), t_zoh] = zoh(fa(i-1),fa(i),t_zoh,t(i),false); % zero order hold, set to true to implement nonlinear behavior
     end
     
     % force between the hand and the handle
@@ -140,7 +140,8 @@ for i = 1:length(t)
     ffelt(i) = -fh;
     
     % damping force
-    ff = -vh(i)*b;
+    ff = -karnop(vh(i),b,true); % nonlinear friction, set to true to implement nonlinear behavior
+
     
     % Compute the sum of forces on the handle: applied force, human force,
     % and friction force.
@@ -155,11 +156,10 @@ end
 
 %% Nonlinear Functions 
 
-function ff = karnop(vh,nonlin)
+function ff = karnop(vh,b,nonlin)
 if nonlin
-    vmax = 1;
-    fstat = 0.1;
-    b = 0;
+    vmax = 0.001;
+    fstat = 0.5;
     if abs(vh) < vmax
         ff = sign(vh)*fstat + b*vh;
     else
@@ -172,7 +172,7 @@ end
 
 function xe = encoder(xh1,xh2,nonlin) % Encoder: the measured x-pos as absolute encoder ticks
 if(nonlin)
-    res = 1/(2^10);                 % encoder resolution in rev/tick
+    res = 1/(2^12);                 % encoder resolution in rev/tick
     if abs((xh2-xh1)) < res
     xe = xh1;
     else
@@ -211,7 +211,7 @@ end
 
 function [fa_zoh, t_zoh] = zoh(fa1,fa2,t1,t2,nonlin) % zero order hold for force output
 if(nonlin)
-    ts = 8e-5;                                       % output sampling time
+    ts = 0.1;                                       % output sampling time
     if abs((t2-t1)) < ts
         fa_zoh = fa1;
         t_zoh = t1;
